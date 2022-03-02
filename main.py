@@ -5,7 +5,8 @@ from os import getenv
 
 app = Sanic("app")
 token = getenv("token")
-bot = Bot(token)
+publickey = getenv("publickey")
+bot = Bot(token, publickey)
 
 @app.before_server_start
 async def start(app, loop):

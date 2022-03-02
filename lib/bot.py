@@ -11,8 +11,9 @@ class ApiError(Exception):
 
 class Bot:
     ApiUrl = "https://discord.com/api/v9"
-    def __init__(self, token):
+    def __init__(self, token, publickey):
         self.token = token
+        self.publickey = publickey
         self.commands = []
 
     async def request(self, method, path, *args, **kwargs):
@@ -66,7 +67,7 @@ class Bot:
             await self.request("POST", "/applications/829578365634740225/commands", json=cmd.to_dict())
 
     async def interaction(self, request):
-        verify_key = VerifyKey(bytes.fromhex(str(getenv("publickey"))))
+        verify_key = VerifyKey(bytes.fromhex(self.publickey)))
         signature = request.headers.get("x-signature-ed25519")
         timestamp = request.headers.get("x-signature-timestamp")
         try:
