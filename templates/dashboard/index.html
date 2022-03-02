@@ -1,0 +1,18 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<p>設定したいサーバーを選んでください</p>
+<p id="result">no</p>
+<div id="guilds" class="grid grid-cols-3 gap-4"></div>
+<script>
+    $.ajax("/api/guilds").done(function (data) {
+        $("#result").text("ok")
+        for (let d in data) {
+            if (data[d]["permissions"] === "2199023255551") {
+                $("#guilds").before(
+                    `<a href="/dashboard/${data[d]["id"]}"><img width=200 height=200 src="https://cdn.discordapp.com/icons/${data[d]["id"]}/${data[d]["icon"]}.png"></a>`
+                )
+            }
+        }
+    })
+</script>
+{% endblock %}
