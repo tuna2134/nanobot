@@ -63,7 +63,6 @@ class Bot:
             else:
                 need.append(command)
         for cmd in need:
-            print(f"Add: {cmd.name}")
             await self.request("POST", "/applications/829578365634740225/commands", json=cmd.to_dict())
 
     async def interaction(self, request):
@@ -72,9 +71,7 @@ class Bot:
         timestamp = request.headers.get("x-signature-timestamp")
         try:
             verify_key.verify(f'{timestamp}{request.body.decode()}'.encode(), bytes.fromhex(signature))
-            print("認証に成功")
         except BadSignatureError:
-            print("認証に失敗しました")
             return text("invalid request signature", status=401)
         else:
             data = request.json
