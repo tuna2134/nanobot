@@ -1,11 +1,21 @@
 from sanic import Sanic
-from sanic.response import text
+from sanic.response import text, html
+from jinja2 import Environment, FileSystemLoader
 from lib.bot import Bot
 from os import getenv
 
 app = Sanic("app")
 token = getenv("token")
 publickey = getenv("publickey")
+env = Environment(
+    loader=FileSystemLoader("./templates"),
+    enable_async=True
+)
+
+async def template(filename, *args, **kwargs):
+    content = await env.get_template(filename).render_async(kwargs)
+    return html(content)
+
 bot = Bot(token, publickey)
 
 @app.before_server_start
@@ -18,7 +28,7 @@ async def interaction(request):
 
 @app.route("/")
 async def main(request):
-    return text("test")
+    return await template("base.html")
 
 @bot.slash_command("ping", "ping command")
 async def ping(interaction):
