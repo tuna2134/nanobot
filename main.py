@@ -21,7 +21,7 @@ async def main(request):
 
 @bot.slash_command("ping", "ping command")
 async def ping(interaction):
-    return interaction.send("hello")
+    return interaction.send("pong!")
 
 app.run(
     host="0.0.0.0",
