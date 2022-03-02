@@ -67,7 +67,7 @@ class Bot:
             await self.request("POST", "/applications/829578365634740225/commands", json=cmd.to_dict())
 
     async def interaction(self, request):
-        verify_key = VerifyKey(bytes.fromhex(self.publickey)))
+        verify_key = VerifyKey(bytes.fromhex(self.publickey))
         signature = request.headers.get("x-signature-ed25519")
         timestamp = request.headers.get("x-signature-timestamp")
         try:
