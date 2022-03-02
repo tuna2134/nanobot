@@ -24,6 +24,10 @@ async def main(request):
 async def ping(interaction):
     return interaction.send("pong!")
 
+@bot.slash_command("invite", "show invite url")
+async def invite(interaction):
+    return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
+
 app.run(
     host="0.0.0.0",
     port=8080
