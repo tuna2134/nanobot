@@ -71,6 +71,11 @@ async def dashboard(request, user):
 async def dashboard_guild(request, user, guild):
     return await template("dashboard/guild.html", guildid=guild)
 
+@app.get("/dashboard/<guild>/setting")
+@require()
+async def dashboard_setting(request, user, guild):
+    return await template("dashboard/setting.html", guildid=guild)
+
 # api
 
 @app.get("/api/user")
@@ -93,6 +98,10 @@ async def guilds(request):
 @bot.slash_command("ping", "ping command")
 async def ping(interaction):
     return interaction.send("pong!")
+
+@ping.after
+async def pingsdd():
+    print("after")
 
 @bot.slash_command("naup", "表示順をアップします")
 async def naup(interaction):

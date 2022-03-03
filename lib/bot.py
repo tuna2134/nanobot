@@ -38,7 +38,9 @@ class Bot:
 
     def slash_command(self, name, description):
         def decorator(coro):
-            self.commands.append(Command(coro, name, description))
+            cmd = Command(coro, name, description)(coro)
+            self.commands.append(cmd)
+            return cmd
         return decorator
 
     async def on_interaction(self, interaction):
