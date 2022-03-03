@@ -31,14 +31,14 @@ class Bot:
                     elif r.status == 500:
                         raise ApiError("500 error")
 
-    async def process_slash_command(self, name, *args, **kwargs):
+    async def process_slash_command(self, name, interaction, *args, **kwargs):
         for command in self.commands:
             if command.name == name:
-                return await command.callback(*args, **kwargs)
+                return await command.callback(interaction, *args, **kwargs)
 
     def slash_command(self, name, description):
         def decorator(coro):
-            cmd = Command(coro, name, description)(coro)
+            cmd = Command(coro, name, description)
             self.commands.append(cmd)
             return cmd
         return decorator

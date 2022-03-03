@@ -1,24 +1,22 @@
 from sanic.response import json
+import asyncio
 
 class Command:
-    def __new__(cls, *args, **kwargs):
-        self = super().__new__(cls)
-        return self
-        
     def __init__(self, coro, name, description):
         self.name = name
         self.description = description
         self.callback = coro
-        self.after = []
+        self._after = []
 
     async def __call__(self, *args, **kwargs):
         return await self.callback(*args, **kwargs)
 
-    def response_json(self, data, *args, **kwargs):
-        pass
+    def dispatch(self):
+        for f in self._after:
+            asyncio.create_task(f())
 
     def after(self, coro):
-        self.after.append(coro)
+        self._after.append(coro)
         return coro
 
     def to_dict(self):

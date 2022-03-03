@@ -12,13 +12,21 @@ class Interaction:
     def type(self):
         return self.__data["type"]
 
-    def send(self, content):
+    def send(self, content=None, *,
+             tts=None, embeds: list=None,
+             ephemeral: bool=False):
         payload = {
             "type": 4,
             "data": {}
         }
         if content is not None:
             payload["data"]["content"] = content
+        if tts is not None:
+            payload["data"]["tts"] = True
+        if embeds is not None:
+            payload["data"]["embeds"] = [embed.payload for embed in embeds]
+        if ephemeral is True:
+            payload["flags"] = 1 << 6
         return json(payload)
 
 class InteractionCommand:

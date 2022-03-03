@@ -4,6 +4,7 @@ from aiohttp import ClientSession
 from jinja2 import Environment, FileSystemLoader
 from lib.bot import Bot
 from lib.oauth2 import require
+from lib.types import Embed
 from os import getenv
 
 app = Sanic("app")
@@ -24,6 +25,10 @@ bot = Bot(token, publickey)
 @app.before_server_start
 async def start(app, loop):
     await bot.start(loop)
+
+@app.signal("http.lifecycle.response")
+async def mafter(request, response):
+    print(request.path)
 
 @app.post("/interaction")
 async def interaction(request):
@@ -97,7 +102,7 @@ async def guilds(request):
 
 @bot.slash_command("ping", "ping command")
 async def ping(interaction):
-    return interaction.send("pong!")
+    return interaction.send(embeds=[Embed(title="Pong!")], ephemeral=True)
 
 @ping.after
 async def pingsdd():
