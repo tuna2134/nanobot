@@ -26,9 +26,14 @@ bot = Bot(token, publickey)
 async def start(app, loop):
     await bot.start(loop)
 
-@app.signal("http.lifecycle.response")
-async def mafter(request, response):
-    print(request.path)
+@app.signal("http.lifecycle.complete")
+async def mafter(conn_info):
+    if conn_info.ctx.path == "/interaction":
+        conn_info.ctx._wait_response.set()
+
+@app.on_request
+async def _request(request):
+    request.conn_info.ctx.path = request.path
 
 @app.post("/interaction")
 async def interaction(request):
@@ -106,7 +111,7 @@ async def ping(interaction):
 
 @ping.after
 async def pingsdd():
-    print("after")
+    print("送信したよ")
 
 @bot.slash_command("naup", "表示順をアップします")
 async def naup(interaction):

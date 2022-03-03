@@ -5,6 +5,7 @@ from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from aiohttp import ClientSession
 from os import getenv
+import asyncio
 
 class ApiError(Exception):
     pass
@@ -34,7 +35,13 @@ class Bot:
     async def process_slash_command(self, name, interaction, *args, **kwargs):
         for command in self.commands:
             if command.name == name:
+                interaction.request.conn_info.ctx._wait_response = asyncio.Event()
+                asyncio.create_task(self._wait_response(interaction, command))
                 return await command.callback(interaction, *args, **kwargs)
+
+    async def _wait_response(self, interaction, command):
+        await interaction.request.conn_info.ctx._wait_response.wait()
+        command.dispatch()
 
     def slash_command(self, name, description):
         def decorator(coro):
@@ -81,4 +88,5 @@ class Bot:
                 return json({"type": 1})
             else:
                 interaction = Interaction(data)
+                interaction.request = request
                 return await self.on_interaction(interaction)
