@@ -58,10 +58,13 @@ class InteractionMessage:
     def channel_id(self):
         return self._data.get("channel_id")
 
-    async def edit(self, content=None):
+    async def edit(self, content=None, *,
+                   embeds: list=None):
         payload = {}
         if content is not None:
             payload["content"] = content
+        if embeds is not None:
+            payload["embeds"] = [embed.payload for embed in embeds]
         await self.interaction.client.request("PATCH", f"/webhooks/829578365634740225/{self.interaction.token}/messages/@original", json=payload)
     
 class InteractionCommand:
