@@ -107,10 +107,12 @@ async def guilds(request):
 
 @bot.slash_command("ping", "ping command")
 async def ping(interaction):
-    return interaction.send(embeds=[Embed(title="Pong!")], ephemeral=True)
+    return interaction.send("Pong!", ephemeral=True)
 
 @ping.after
-async def pingsdd():
+async def pingsdd(interaction):
+    message = await interaction.fetch_message()
+    await message.edit("Ping")
     print("送信したよ")
 
 @bot.slash_command("naup", "表示順をアップします")

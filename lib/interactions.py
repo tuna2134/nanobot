@@ -1,8 +1,17 @@
 from sanic.response import json
 
 class Interaction:
-    def __init__(self, data):
+    def __init__(self, client, data):
         self.__data = data
+        self.client = client
+
+    @property
+    def token(self):
+        return self.__data["token"]
+
+    @property
+    def id(self):
+        return self.__data["id"]
 
     @property
     def command(self):
@@ -29,6 +38,32 @@ class Interaction:
             payload["flags"] = 1 << 6
         return json(payload)
 
+    async def fetch_message(self):
+        return InteractionMessage(self, await self.client.request("GET", f"/webhooks/829578365634740225/{self.token}/messages/@original"))
+
+class InteractionMessage:
+    def __init__(self, interaction, data):
+        self._data = data
+        self.interaction = interaction
+
+    @property
+    def id(self):
+        return self._data["id"]
+
+    @property
+    def content(self):
+        return self._data["content"]
+
+    @property
+    def channel_id(self):
+        return self._data.get("channel_id")
+
+    async def edit(self, content=None):
+        payload = {}
+        if content is not None:
+            payload["content"] = content
+        await self.interaction.client.request("PATCH", f"/webhooks/829578365634740225/{self.interaction.token}/messages/@original", json=payload)
+    
 class InteractionCommand:
     def __init__(self, data):
         self._data = data

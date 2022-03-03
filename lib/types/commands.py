@@ -11,9 +11,9 @@ class Command:
     async def __call__(self, *args, **kwargs):
         return await self.callback(*args, **kwargs)
 
-    def dispatch(self):
+    def dispatch(self, *args, **kwargs):
         for f in self._after:
-            asyncio.create_task(f())
+            asyncio.create_task(f(*args, **kwargs))
 
     def after(self, coro):
         self._after.append(coro)

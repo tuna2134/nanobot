@@ -41,7 +41,7 @@ class Bot:
 
     async def _wait_response(self, interaction, command):
         await interaction.request.conn_info.ctx._wait_response.wait()
-        command.dispatch()
+        command.dispatch(interaction)
 
     def slash_command(self, name, description):
         def decorator(coro):
@@ -87,6 +87,6 @@ class Bot:
             if data["type"] == 1:
                 return json({"type": 1})
             else:
-                interaction = Interaction(data)
+                interaction = Interaction(self, data)
                 interaction.request = request
                 return await self.on_interaction(interaction)
