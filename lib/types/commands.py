@@ -35,8 +35,14 @@ class Command:
                 data = CommandOption(p.name, "...").payload
             if p.annotation == p.empty:
                 data["type"] = 3
+            elif p.annotation == str:
+                data["type"] = 3
+            elif p.annotation == int:
+                data["type"] = 4
             elif p.annotation == User:
                 data["type"] = 6
+            else:
+                data["type"] = 3
             data["name"] = p.name
             rdata.append(data)
         return rdata
@@ -46,6 +52,30 @@ class Command:
             "name": self.name,
             "description": self.description,
             "options": self._change_parameter(),
+            "type": 1
+        }
+        return payload
+
+class GroupCommand:
+    def __init__(self, name):
+        self._name = name
+        self._command = []
+
+    @property
+    def name(self):
+        return self._name
+
+    def slash_command(self, name, description):
+        def decorator(coro):
+            cmd = Command(coro, name, description)
+            self._command.append(cmd)
+            return cmd
+        return decorator
+
+    def to_dict(self):
+        payload = {
+            "name": self.name,
+            "options": [command.to_dict() for command in self._command],
             "type": 1
         }
         return payload

@@ -6,6 +6,7 @@ class Bot(lib.Cog):
 
     @lib.slash_command("ping", "主にサーバーが動いているかをチェックするコマンドです。")
     async def ping(self, interaction):
+        print(test.to_dict())
         return interaction.send(embeds=[
             lib.Embed(title="Pong")
         ], ephemeral=True)
@@ -16,9 +17,9 @@ class Bot(lib.Cog):
 
     @lib.slash_command("support", "サポートします。")
     async def support(self, interaction, user: lib.User=lib.CommandOption("あなたは誰？", False)):
-        if name is None:
+        if user is None:
             return interaction.send("nameになんか入れて")
-        return interaction.send(name.name)
+        return interaction.send(user.name)
 
 def setup(bot):
     bot.add_cog(Bot(bot))

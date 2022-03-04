@@ -1,3 +1,3 @@
 from .embeds import Embed
-from .commands import CommandOption
+from .commands import CommandOption, GroupCommand
 from .user import User

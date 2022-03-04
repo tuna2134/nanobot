@@ -62,7 +62,9 @@ class Bot:
                     if not d["name"] in kwargs:
                         kwargs[d["name"]] = None
                     else:
-                        if d["type"] == 6:
+                        if d["type"] == 4:
+                            kwargs[d["name"]] = int(kwargs[d["name"]])
+                        elif d["type"] == 6:
                             kwargs[d["name"]] = await self.fetch_user(kwargs[d["name"]])
                 if hasattr(command, "cog"):
                     return await command.callback(command.cog, interaction, **kwargs)
