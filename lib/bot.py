@@ -4,6 +4,7 @@ from sanic.response import json, text
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 from aiohttp import ClientSession
+from importlib import import_module
 from os import getenv
 import asyncio
 
@@ -16,6 +17,7 @@ class Bot:
         self.token = token
         self.publickey = publickey
         self.commands = []
+        self.cogs = {}
 
     async def request(self, method, path, *args, **kwargs):
         headers = {
@@ -29,6 +31,11 @@ class Bot:
                         raise ApiError("404 error")
                     elif r.status == 200:
                         return await r.json()
+                    elif r.status == 429:
+                        if r.headers.get("Retry-After"):
+                            await asyncio.sleep(int(r.headers["Retry-After"]))
+                        else:
+                            raise ApiError("rate limit!")
                     elif r.status == 500:
                         raise ApiError("500 error")
 
@@ -37,6 +44,8 @@ class Bot:
             if command.name == name:
                 interaction.request.conn_info.ctx._wait_response = asyncio.Event()
                 asyncio.create_task(self._wait_response(interaction, command))
+                if hasattr(command, "cog"):
+                    return await command.callback(command.cog, interaction, *args, **kwargs)
                 return await command.callback(interaction, *args, **kwargs)
 
     async def _wait_response(self, interaction, command):
@@ -49,6 +58,14 @@ class Bot:
             self.commands.append(cmd)
             return cmd
         return decorator
+
+    def add_cog(self, cog):
+        self.cogs[cog.__class__.__name__] = cog
+        cog._inject(self)
+
+    def load_extension(self, name):
+        lib = import_module(name)
+        lib.setup(self)
 
     async def on_interaction(self, interaction):
         if interaction.type == 2:

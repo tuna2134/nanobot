@@ -13,7 +13,10 @@ class Command:
 
     def dispatch(self, *args, **kwargs):
         for f in self._after:
-            asyncio.create_task(f(*args, **kwargs))
+            if hasattr(self, "cog"):
+                asyncio.create_task(f(self.cog, *args, **kwargs))
+            else:
+                asyncio.create_task(f(*args, **kwargs))
 
     def after(self, coro):
         self._after.append(coro)

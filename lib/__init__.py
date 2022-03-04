@@ -1,0 +1,1 @@
+from .cogs import Cog, slash_command

@@ -25,6 +25,7 @@ bot = Bot(token, publickey)
 @app.before_server_start
 async def start(app, loop):
     await bot.start(loop)
+    bot.load_extension("test")
 
 @app.signal("http.lifecycle.complete")
 async def mafter(conn_info):
@@ -105,20 +106,31 @@ async def guilds(request):
 
 # slashcommand
 
-@bot.slash_command("ping", "ping command")
+@bot.slash_command("ping", "主にサーバーが動いているかをチェックするコマンドです。")
 async def ping(interaction):
-    return interaction.send(embeds=[Embed(title="Pong")], ephemeral=True)
+    return interaction.send(embeds=[
+        Embed(title="Pong")
+    ], ephemeral=True)
 
 @ping.after
-async def pingsdd(interaction):
+async def ping_after(interaction):
     message = await interaction.fetch_message()
-    await message.edit(embeds=[Embed(title="Ping")])
+    await message.edit(embeds=[
+        Embed(title="Ping")
+    ])
 
+"""
 @bot.slash_command("naup", "表示順をアップします")
 async def naup(interaction):
-    return interaction.send("作成中")
+    return interaction.send("表示順をアップします...")
 
-@bot.slash_command("invite", "show invite url")
+@naup.after
+async def naup_after(interaction):
+    message = await interaction.fetch_message()
+    await message.edit("現在作成中")
+"""
+
+@bot.slash_command("invite", "botを導入するためのリンクを表示します")
 async def invite(interaction):
     return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
 
