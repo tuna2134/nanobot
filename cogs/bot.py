@@ -15,10 +15,10 @@ class Bot(lib.Cog):
         return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
 
     @lib.slash_command("support", "サポートします。")
-    async def support(self, interaction, name=lib.CommandOption("案件を教えて", False)):
+    async def support(self, interaction, user: lib.User=lib.CommandOption("あなたは誰？", False)):
         if name is None:
             return interaction.send("nameになんか入れて")
-        return interaction.send(name)
+        return interaction.send(name.name)
 
 def setup(bot):
     bot.add_cog(Bot(bot))

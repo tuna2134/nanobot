@@ -1,4 +1,5 @@
 from .interactions import Interaction
+from .types import User
 from .types.commands import Command, CommandOption
 from sanic.response import json, text
 from nacl.signing import VerifyKey
@@ -44,6 +45,9 @@ class Bot:
                     elif r.status == 500:
                         raise ApiError("500 error")
 
+    async def fetch_user(self, id):
+        return User(await self.request("GET", f"/users/{id}"))
+
     async def process_slash_command(self, name: str,
                                     interaction: Interaction):
         for command in self.commands:
@@ -57,6 +61,9 @@ class Bot:
                 for d in command._change_parameter():
                     if not d["name"] in kwargs:
                         kwargs[d["name"]] = None
+                    else:
+                        if d["type"] == 6:
+                            kwargs[d["name"]] = await self.fetch_user(kwargs[d["name"]])
                 if hasattr(command, "cog"):
                     return await command.callback(command.cog, interaction, **kwargs)
                 else:

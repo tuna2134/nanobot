@@ -1,4 +1,5 @@
 from sanic.response import json
+from .types import User
 
 class Interaction:
     def __init__(self, client, data):
@@ -12,6 +13,10 @@ class Interaction:
     @property
     def id(self):
         return self.__data["id"]
+
+    @property
+    def user(self):
+        return User(self.__data["member"]["user"])
 
     @property
     def command(self):

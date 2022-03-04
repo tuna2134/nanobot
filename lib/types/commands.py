@@ -1,6 +1,7 @@
 from sanic.response import json
 from inspect import signature
 import asyncio
+from .user import User
 
 class Command:
     def __init__(self, coro, name, description):
@@ -34,6 +35,8 @@ class Command:
                 data = CommandOption(p.name, "...").payload
             if p.annotation == p.empty:
                 data["type"] = 3
+            elif p.annotation == User:
+                data["type"] = 6
             data["name"] = p.name
             rdata.append(data)
         return rdata
@@ -46,13 +49,6 @@ class Command:
             "type": 1
         }
         return payload
-
-    @property
-    def _options(self):
-        data = {}
-        for p in signature(self.callback).parameters.values():
-            data[p.name] = p.default.payload["required"]
-        return data
 
 class CommandOption:
     def __init__(self, description: str, required: bool=True):
