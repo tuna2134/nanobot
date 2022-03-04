@@ -38,7 +38,6 @@ async def mafter(conn_info):
 
 @app.on_request
 async def _request(request):
-    # print(request.path)
     request.conn_info.ctx.path = request.path
 
 @app.post("/interaction")
