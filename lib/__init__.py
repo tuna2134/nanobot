@@ -1,2 +1,2 @@
 from .cogs import Cog, slash_command, route
-from .types import Embed
+from .types import Embed, CommandOption

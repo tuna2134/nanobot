@@ -1,5 +1,5 @@
 from .interactions import Interaction
-from .types.commands import Command
+from .types.commands import Command, CommandOption
 from sanic.response import json, text
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
@@ -7,6 +7,8 @@ from aiohttp import ClientSession
 from importlib import import_module
 from os import getenv
 import asyncio
+
+from typing import Optional
 
 class ApiError(Exception):
     pass
@@ -20,7 +22,9 @@ class Bot:
         self.commands = []
         self.cogs = {}
 
-    async def request(self, method, path, *args, **kwargs):
+    async def request(self, method: str,
+                      path: str
+                      , *args, **kwargs) -> Optional[dict]:
         headers = {
             "Authorization": "Bot {}".format(self.token)
         }
@@ -40,44 +44,53 @@ class Bot:
                     elif r.status == 500:
                         raise ApiError("500 error")
 
-    async def process_slash_command(self, name, interaction, *args, **kwargs):
+    async def process_slash_command(self, name: str,
+                                    interaction: Interaction):
         for command in self.commands:
             if command.name == name:
                 interaction.request.conn_info.ctx._wait_response = asyncio.Event()
                 asyncio.create_task(self._wait_response(interaction, command))
+                kwargs = {}
+                if interaction.command.options:
+                    for option in interaction.command.options:
+                        kwargs[option.name] = option.value
+                for d in command._change_parameter():
+                    if not d["name"] in kwargs:
+                        kwargs[d["name"]] = None
                 if hasattr(command, "cog"):
-                    return await command.callback(command.cog, interaction, *args, **kwargs)
-                return await command.callback(interaction, *args, **kwargs)
+                    return await command.callback(command.cog, interaction, **kwargs)
+                else:
+                    return await command.callback(interaction, **kwargs)
 
-    async def _wait_response(self, interaction, command):
+    async def _wait_response(self, interaction: Interaction, command: Command) -> None:
         await interaction.request.conn_info.ctx._wait_response.wait()
         command.dispatch(interaction)
 
-    def slash_command(self, name, description):
+    def slash_command(self, name: str, description: str):
         def decorator(coro):
             cmd = Command(coro, name, description)
             self.commands.append(cmd)
             return cmd
         return decorator
 
-    def add_cog(self, cog):
+    def add_cog(self, cog) -> None:
         self.cogs[cog.__class__.__name__] = cog
         cog._inject(self)
 
-    def remove_cog(self, name):
+    def remove_cog(self, name: str) -> None:
         cog = self.cogs[name]
         cog._rinject(self)
         del self.cogs[name]
 
-    def load_extension(self, name):
+    def load_extension(self, name: str) -> None:
         lib = import_module(name)
         lib.setup(self)
 
-    async def on_interaction(self, interaction):
+    async def on_interaction(self, interaction: Interaction):
         if interaction.type == 2:
             return await self.process_slash_command(interaction.command.name, interaction)
 
-    async def start(self, loop):
+    async def start(self, loop) -> None:
         self.loop = loop
         datas = await self.request("GET", "/applications/829578365634740225/commands")
         need = []

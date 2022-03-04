@@ -72,5 +72,22 @@ class InteractionCommand:
         self._data = data
 
     @property
+    def options(self):
+        if self._data.get("options"):
+            return [InteractionCommandOption(d) for d in self._data["options"]]
+
+    @property
     def name(self):
         return self._data["name"]
+
+class InteractionCommandOption:
+    def __init__(self, data):
+        self._data = data
+
+    @property
+    def name(self):
+        return self._data["name"]
+
+    @property
+    def value(self):
+        return self._data["value"]
