@@ -64,6 +64,11 @@ class Bot:
         self.cogs[cog.__class__.__name__] = cog
         cog._inject(self)
 
+    def remove_cog(self, name):
+        cog = self.cogs[name]
+        cog._rinject(self)
+        del self.cogs[name]
+
     def load_extension(self, name):
         lib = import_module(name)
         lib.setup(self)
