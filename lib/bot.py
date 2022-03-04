@@ -95,6 +95,10 @@ class Bot:
         lib = import_module(name)
         lib.setup(self)
 
+    def add_commandgroup(self, group):
+        pass
+        # self.commands.append(group)
+
     async def on_interaction(self, interaction: Interaction):
         if interaction.type == 2:
             return await self.process_slash_command(interaction.command.name, interaction)

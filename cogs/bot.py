@@ -1,12 +1,16 @@
 import lib
 
 class Bot(lib.Cog):
+    test = lib.CommandGroup("test")
     def __init__(self, bot):
         self.bot = bot
 
+    @test.slash_command("user", "ユーザーを表示します")
+    async def user(self, interaction, user: lib.CommandOption("ユーザーを選択してね")):
+        return interaction.send("aaaa")
+
     @lib.slash_command("ping", "主にサーバーが動いているかをチェックするコマンドです。")
     async def ping(self, interaction):
-        print(test.to_dict())
         return interaction.send(embeds=[
             lib.Embed(title="Pong")
         ], ephemeral=True)
@@ -15,8 +19,8 @@ class Bot(lib.Cog):
     async def invite(self, interaction):
         return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
 
-    @lib.slash_command("support", "サポートします。")
-    async def support(self, interaction, user: lib.User=lib.CommandOption("あなたは誰？", False)):
+    @lib.slash_command("support", "サポートします")
+    async def support(self, interaction, user: lib.User=lib.CommandOption("あなたは誰？", True)):
         if user is None:
             return interaction.send("nameになんか入れて")
         return interaction.send(user.name)

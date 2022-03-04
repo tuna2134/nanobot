@@ -56,7 +56,7 @@ class Command:
         }
         return payload
 
-class GroupCommand:
+class CommandGroup:
     def __init__(self, name):
         self._name = name
         self._command = []
