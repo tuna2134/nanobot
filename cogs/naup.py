@@ -1,7 +1,7 @@
 import lib
 from sanic.response import text
 
-class test(lib.Cog):
+class naup(lib.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -15,4 +15,4 @@ class test(lib.Cog):
         await message.edit("現在作成中")
 
 def setup(bot):
-    bot.add_cog(test(bot))
+    bot.add_cog(naup(bot))

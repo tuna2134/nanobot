@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 from lib.bot import Bot
 from lib.oauth2 import require
 from lib.types import Embed
-from os import getenv
+from os import getenv, listdir
 
 app = Sanic("app")
 token = getenv("token")
@@ -24,7 +24,10 @@ bot = Bot(app, token, publickey)
 
 @app.main_process_start
 async def start(app, loop):
-    bot.load_extension("test")
+    for name in listdir("cogs"):
+        if name.startswith("__"):
+            continue
+        bot.load_extension("cogs." + name[:-3])
     await bot.start(loop)
     print("loaded")
 
@@ -104,36 +107,6 @@ async def guilds(request):
         }
         async with session.get(ApiUrl + "/users/@me/guilds", headers=headers) as r:
             return json(await r.json())
-
-# slashcommand
-
-@bot.slash_command("ping", "主にサーバーが動いているかをチェックするコマンドです。")
-async def ping(interaction):
-    return interaction.send(embeds=[
-        Embed(title="Pong")
-    ], ephemeral=True)
-
-@ping.after
-async def ping_after(interaction):
-    message = await interaction.fetch_message()
-    await message.edit(embeds=[
-        Embed(title="Ping")
-    ])
-
-"""
-@bot.slash_command("naup", "表示順をアップします")
-async def naup(interaction):
-    return interaction.send("表示順をアップします...")
-
-@naup.after
-async def naup_after(interaction):
-    message = await interaction.fetch_message()
-    await message.edit("現在作成中")
-"""
-
-@bot.slash_command("invite", "botを導入するためのリンクを表示します")
-async def invite(interaction):
-    return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
 
 app.run(
     host="0.0.0.0",
