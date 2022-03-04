@@ -1,4 +1,5 @@
 import lib
+from sanic.response import text
 
 class test(lib.Cog):
     def __init__(self, bot):

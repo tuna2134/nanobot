@@ -20,12 +20,13 @@ async def template(filename, *args, **kwargs):
     content = await env.get_template(filename).render_async(kwargs)
     return html(content)
 
-bot = Bot(token, publickey)
+bot = Bot(app, token, publickey)
 
-@app.before_server_start
+@app.main_process_start
 async def start(app, loop):
-    await bot.start(loop)
     bot.load_extension("test")
+    await bot.start(loop)
+    print("loaded")
 
 @app.signal("http.lifecycle.complete")
 async def mafter(conn_info):

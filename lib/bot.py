@@ -13,7 +13,8 @@ class ApiError(Exception):
 
 class Bot:
     ApiUrl = "https://discord.com/api/v9"
-    def __init__(self, token, publickey):
+    def __init__(self, app, token, publickey):
+        self.web = app
         self.token = token
         self.publickey = publickey
         self.commands = []
