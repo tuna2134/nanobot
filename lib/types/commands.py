@@ -47,13 +47,21 @@ class Command:
             rdata.append(data)
         return rdata
 
+    @property
+    def options(self):
+        return self._change_parameter()
+
     def to_dict(self):
         payload = {
             "name": self.name,
             "description": self.description,
-            "options": self._change_parameter(),
             "type": 1
         }
+        options = self._change_parameter()
+        if len(options) != 0:
+            payload["options"] = options
+        else:
+            payload["options"] = []
         return payload
 
 class CommandGroup:
@@ -85,6 +93,3 @@ class CommandOption:
         self.payload = {}
         self.payload["description"] = description
         self.payload["required"] = required
-
-    def __call__(self, *args, **kwargs):
-        return None

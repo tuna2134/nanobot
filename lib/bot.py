@@ -107,6 +107,7 @@ class Bot:
         self.loop = loop
         datas = await self.request("GET", "/applications/829578365634740225/commands")
         need = []
+        need_edit = []
         for command in self.commands:
             if len(datas) == 0:
                 need.append(command)
@@ -114,14 +115,37 @@ class Bot:
             for data in datas:
                 if data["name"] == command.name:
                     if data["description"] == command.description:
-                        break
+                        for option in command.options:
+                            if len(command.options) != len(data["options"]):
+                                print('数が揃わない')
+                                d = command.to_dict()
+                                del d["name"]
+                                del d["description"]
+                                del d["type"]
+                                need_edit.append((data["id"], d))
+                            for api_option in data["options"]:
+                                if option["name"] == api_option["name"]:
+                                    if option["description"] == api_option["description"]:
+                                        break
+                                    else:
+                                        d = command.to_dict()
+                                        del d["name"]
+                                        del d["description"]
+                                        del d["type"]
+                                        need_edit.append((data["id"], d))
                     else:
-                        need.append(command)
+                        d = command.to_dict()
+                        del d["name"]
+                        del d["type"]
+                        del d["options"]
+                        need_edit.append((data["id"], d))
                         break
             else:
                 need.append(command)
         for cmd in need:
             await self.request("POST", "/applications/829578365634740225/commands", json=cmd.to_dict())
+        for cmd_id, data in need_edit:
+            await self.request("PATCH", f"/applications/829578365634740225/commands/{cmd_id}", json=data)
 
     async def interaction(self, request):
         verify_key = VerifyKey(bytes.fromhex(self.publickey))

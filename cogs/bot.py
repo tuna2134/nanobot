@@ -9,6 +9,10 @@ class Bot(lib.Cog):
     async def user(self, interaction, user: lib.CommandOption("ユーザーを選択してね")):
         return interaction.send("aaaa")
 
+    @lib.slash_command("help", "ヘルプコマンド")
+    async def help(self, interaction):
+        return interaction.send("https://hortbot-dev.github.io/nanobot.html")
+
     @lib.slash_command("ping", "主にサーバーが動いているかをチェックするコマンドです。")
     async def ping(self, interaction):
         return interaction.send(embeds=[
@@ -19,11 +23,9 @@ class Bot(lib.Cog):
     async def invite(self, interaction):
         return interaction.send("https://discord.com/api/oauth2/authorize?client_id=829578365634740225&permissions=1&scope=bot%20applications.commands")
 
-    @lib.slash_command("support", "サポートします")
-    async def support(self, interaction, user: lib.User=lib.CommandOption("あなたは誰？", True)):
-        if user is None:
-            return interaction.send("nameになんか入れて")
-        return interaction.send(user.name)
+    @lib.slash_command("support", "サポートサーバーを表示します。")
+    async def support(self, interaction, user: lib.User = lib.CommandOption("ユーザーを選んでね")):
+        return interaction.send("https://discord.gg/SGYGBTeNgW")
 
 def setup(bot):
     bot.add_cog(Bot(bot))
